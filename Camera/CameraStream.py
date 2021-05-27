@@ -87,6 +87,9 @@ class VideoStream:
         # return the newest frame
         self.newFrame = False
         self.framesSinceLastRequest = 0
+
+        cv2.imshow("image", self.frame)
+
         return self.frame
 
     def stop(self):

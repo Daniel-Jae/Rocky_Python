@@ -1,26 +1,33 @@
+# Gets Input(Image) from a VideoStream and transforms and warps the Image so that
+# the resulting image has always the same dimensions and the robot- and human-line are on the same side
+# The game-field in the image has to be put manually by calling chooseCorner()
+# -> Left-MouseClick = Robot-Corner AND Right-MouseClick = Human-Corner
+# After the corners have been selected you can choose wheter or not you want to flip the image (so far in the terminal)
+
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 # import concurrent.futures
-import threading
-import time
+# import threading
+# import time
 
+# Test-Images
 img = cv2.imread("Processing/test_image.jpeg", 1)
 img = cv2.resize(img, (0, 0), fx=0.7, fy=0.7)
 
 
 class ProcessField:
-    def __init__(self):
-        # initialize the camera and stream
-        # self.videostream = videoStream
-        # self.image = videoStream.getImage
+    def __init__(self, videoStream):
+        self.videostream = videoStream
         self.image = img
         self.ptHuman = []
         self.ptRobot = []
+
+        # Points in the source image: Corners of the game-field
         self.pts1 = np.float32([[56, 65], [368, 52], [28, 387], [389, 390]])
 
+        # Points(And therefore dimensions) for the destination-image.
         self.pts2 = np.float32([[0, 0], [640, 0], [0, 400], [640, 400]])
 
         self.height = int(self.pts2[3, 0])
@@ -30,8 +37,10 @@ class ProcessField:
         self.rotate = 0
         # True -> larger width than height (Goal-line left and right); False -> larger height than width (Goal-line top and bottom)
         self.suitableForm = True
+        # True -> Flip Image vertically: Change left and right for robot
+        self.flipImage = False
 
-        # cv2.setMouseCallback('Set Corner', self.click_event)
+        self.choosenCorner = False
 
     def click_event(self, event, x, y, flags, param):
         # checking for left mouse clicks
@@ -69,7 +78,7 @@ class ProcessField:
     def chooseCorner(self):
         print(self.image)
         cv2.imshow("image", self.image)
-        cv2.setMouseCallback("image", self.click_event)
+        cv2.setMouseCallback("Set Corner", self.click_event)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -214,6 +223,54 @@ class ProcessField:
         plt.subplot(121), plt.imshow(self.image), plt.title("Input")
         plt.subplot(122), plt.imshow(dst), plt.title("Output")
         plt.show()
+
+        # Answer wether or not you want to flip the camera-input vertically.
+        # If you flip: left and right for the robot gets switched
+        answerFlip = None
+        while answerFlip not in ("J", "j", "n", "N"):
+            answerFlip = input("Willst du das Bild spiegeln? (J/N): ")
+            if answerFlip == "j" or answerFlip == "J":
+                self.flipImage = True
+                flippedDst = cv2.flip(dst, 0)
+                plt.imshow(flippedDst), plt.title("Output")
+                plt.show()
+            elif answerFlip == "n" or answerFlip == "N":
+                self.flipImage = False
+            else:
+                print("Bitte gebe (J/N) ein. J = Ja und N = Nein.")
+
+        self.choosenCorner = True
+
+    def getImage(self):
+        # Because the flow of the programm doesn't use getImage() before chooseCorner() got called, this query is useless for now.
+        """if self.chooseCorner == False:
+            answerCorner = None
+            while answerCorner not in ("J", "j", "n", "N"):
+                answerCorner = input("Du hast noch keine Ecken für das Spielfeld ausgewählt. Mit dem ganzen Bild fortfahren? (J/N): ")
+                if answerCorner == "j" or answerCorner == "J":
+                    return self.videoStream.getImage()
+                elif answerCorner == "n" or answerCorner == "N":
+                    self.chooseCorner()
+                else:
+                    print("Bitte gebe (J/N) ein. J = Ja und N = Nein.")
+
+        else:"""
+
+        img = self.videoStream.getImage()
+        M = cv2.getPerspectiveTransform(self.pts1, self.pts2)
+        dst = cv2.warpPerspective(img, M, (self.height, self.length))
+
+        if self.rotate == 180:
+            dst = cv2.rotate(dst, cv2.cv2.ROTATE_180)
+        elif self.rotate == 90:
+            dst = cv2.rotate(dst, cv2.cv2.ROTATE_90_CLOCKWISE)
+        elif self.rotate == 270:
+            dst = cv2.rotate(dst, cv2.cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+        if self.flipImage == True:
+            dst = cv2.flip(dst, 0)
+
+        return dst
 
 
 if __name__ == "__main__":

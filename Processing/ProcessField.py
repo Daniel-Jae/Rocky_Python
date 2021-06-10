@@ -8,17 +8,19 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
+from constants import *
+
 # import concurrent.futures
 # import threading
 # import time
 
 # Test-Images
-img = cv2.imread("Processing/test_image.jpeg", 1)
+img = cv2.imread("Processing/field_TestImages/test_image.jpeg", 1)
 img = cv2.resize(img, (0, 0), fx=0.7, fy=0.7)
 
 
 class ProcessField:
-    def __init__(self, videoStream):
+    def __init__(self, videoStream=0):
         self.videostream = videoStream
         self.image = img
         self.ptHuman = []
@@ -42,43 +44,46 @@ class ProcessField:
 
         self.choosenCorner = False
 
+    def click_test(event, x, y, flags, param):
+        print("Test")
+
     def click_event(self, event, x, y, flags, param):
         # checking for left mouse clicks
-        if event == cv2.EVENT_LBUTTONDOWN:
-            if len(self.ptRobot) >= 2:
-                return
+        if event == cv2.EVENT_LBUTTONDOWN and len(self.ptRobot) < 2:
             pt = [x, y]
             self.ptRobot.append(pt)
             print(self.ptRobot)
 
             font = cv2.FONT_HERSHEY_SIMPLEX
-            cv2.putText(img, "Roboter", (x + 10, y + 10), font, 0.9, (0, 0, 255), 2)
+            cv2.putText(
+                self.image, "Roboter", (x + 10, y + 10), font, 0.9, (0, 0, 255), 2
+            )
             # circle outside point
-            cv2.circle(img, (x, y), 10, (0, 0, 255), 2)
+            cv2.circle(self.image, (x, y), 10, (0, 0, 255), 2)
             # point
-            cv2.circle(img, (x, y), 2, (0, 0, 255), -1)
-            cv2.imshow("image", img)
+            cv2.circle(self.image, (x, y), 2, (0, 0, 255), -1)
+            cv2.imshow("image", self.image)
 
         # checking for right mouse clicks
-        if event == cv2.EVENT_RBUTTONDOWN:
-            if len(self.ptHuman) >= 2:
-                return
+        elif event == cv2.EVENT_RBUTTONDOWN and len(self.ptHuman) < 2:
             pt = [x, y]
             self.ptHuman.append(pt)
             print(self.ptHuman)
 
             font = cv2.FONT_HERSHEY_SIMPLEX
-            cv2.putText(img, "Mensch", (x + 10, y + 10), font, 0.9, (255, 0, 0), 2)
+            cv2.putText(
+                self.image, "Mensch", (x + 10, y + 10), font, 0.9, (255, 0, 0), 2
+            )
             # circle outside point
-            cv2.circle(img, (x, y), 10, (255, 0, 0), 2)
+            cv2.circle(self.image, (x, y), 10, (255, 0, 0), 2)
             # point
-            cv2.circle(img, (x, y), 2, (255, 0, 0), -1)
-            cv2.imshow("image", img)
+            cv2.circle(self.image, (x, y), 2, (255, 0, 0), -1)
+            cv2.imshow("image", self.image)
 
     def chooseCorner(self):
-        print(self.image)
+        # print(self.image)
         cv2.imshow("image", self.image)
-        cv2.setMouseCallback("Set Corner", self.click_event)
+        cv2.setMouseCallback("image", self.click_event)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -256,7 +261,7 @@ class ProcessField:
 
         else:"""
 
-        img = self.videoStream.getImage()
+        img = self.videostream.read()
         M = cv2.getPerspectiveTransform(self.pts1, self.pts2)
         dst = cv2.warpPerspective(img, M, (self.height, self.length))
 

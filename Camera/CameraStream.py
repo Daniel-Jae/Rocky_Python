@@ -54,7 +54,7 @@ class VideoStream:
             # 2
             # thread_pool = concurrent.futures.ThreadPoolExecutor()
             # thread_pool.submit(self.update)
-
+            # time.sleep(2.0)
             return self
 
     def update(self):
@@ -65,12 +65,14 @@ class VideoStream:
             return
         try:
             while True:
+                # print("new pic")
                 # grab the frame from the stream and clear the stream in
                 # preparation for the next frame
                 ret, frame = video.read()
                 # ret checks if you could actually get a frame
                 if ret:
                     self.frame = frame
+                    cv2.imshow("image", self.frame)
                 self.newFrame = True
                 self.framesSinceLastRequest += 1
 

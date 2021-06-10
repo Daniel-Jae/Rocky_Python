@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-img = cv2.imread("Processing/test_image.jpeg", 1)
+img = cv2.imread("Processing/field_TestImages/test_image.jpeg", 1)
 img = cv2.resize(img, (0, 0), fx=0.7, fy=0.7)
 
 # width = int(img.get(3))

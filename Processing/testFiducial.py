@@ -13,6 +13,12 @@ import sys
 img = cv2.imread("Processing/fiducial_TestImages/fid_test_7.jpeg", 1)
 img = cv2.resize(img, (0, 0), fx=0.7, fy=0.7)
 
+blurred = cv2.medianBlur(img, 3)
+cv2.imshow("test", blurred)
+cv2.waitKey(0)
+
+img = blurred
+
 # define names of each possible ArUco tag OpenCV support
 
 
@@ -26,7 +32,7 @@ arucoParams = cv2.aruco.DetectorParameters_create()
 id = 0
 
 # verify *at least* one ArUco marker was detected
-if len(corners) > 0 and constants.PUCK_ARUCO_ID in ids:
+if len(corners) > 0 and (constants.PUCK_ARUCO_ID in ids):
     # flatten the ArUco IDs list
     ids = ids.flatten()
     # loop over the detected ArUCo corners

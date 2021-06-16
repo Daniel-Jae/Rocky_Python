@@ -3,7 +3,7 @@ import os
 import time
 from Camera.CameraStream import VideoStream
 from Processing.ProcessField import ProcessField
-from Processing.ProcessPuck import ProcessPuck
+from Processing.ProcessPuck_Fiducial import ProcessPuck
 
 
 # ROOT_DIR = os.path.dirname(os.path.abspath("start.py"))

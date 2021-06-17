@@ -72,12 +72,16 @@ def show(source=0):
             video_getter.stop()
             break
 
-        frame, amountOfFrames = video_getter.get()
+        frame, amountOfFrames = video_getter.read()
+        if amountOfFrames == 0:
+            continue
+        print(amountOfFrames)
         cv2.imshow("Video", frame)
 
 
 if __name__ == "__main__":
     pass
 
-    video = VideoStream()
-    video.start()
+    show(0)
+    # video = VideoStream()
+    # video.start()

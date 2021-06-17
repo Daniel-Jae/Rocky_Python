@@ -4,6 +4,7 @@ import time
 from Camera.CameraStream import VideoStream
 from Processing.ProcessField import ProcessField
 from Processing.ProcessPuck_Fiducial import ProcessPuck
+from Processing.ProcessPuck_HSV import ProcessPuckHSV
 
 
 # ROOT_DIR = os.path.dirname(os.path.abspath("start.py"))
@@ -14,13 +15,13 @@ newVideoStream = VideoStream()
 
 newVideoStream.start()
 
-# newProcessField = ProcessField(newVideoStream)
+newProcessField = ProcessField(newVideoStream)
 
-# newProcessField.chooseCorner()
+newProcessField.chooseCorner()
 
-# newProcessPuck = ProcessPuck(newProcessField)
+newProcessPuckHSV = ProcessPuckHSV(newProcessField)
 
-# newProcessPuck.showMarker()
+newProcessPuckHSV.getPuckPositionAlways()
 
 # test.start()
 # test.update()

@@ -12,10 +12,6 @@ class ProcessPuckHSV:
         self.lower_boundary = np.array([61, 94, 40])
         self.upper_boundary = np.array([90, 255, 144])
 
-    def printBound(self):
-        print(self.upper_boundary[1].item())
-        print(type(self.upper_boundary[1].item()))
-
     # callback-function for trackbar. We don't use it, but have to declare it
     def nothing(x, y):
         pass
@@ -101,8 +97,8 @@ class ProcessPuckHSV:
         cv2.destroyAllWindows()
 
     def getPuckPosition(self):
-        # img = self.getField.getImage()
-        img = self.getImage()
+        # img = self.getImage()
+        img, amountOfFrames = self.getField.getImage()
 
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
@@ -127,13 +123,49 @@ class ProcessPuckHSV:
         center = (int(x), int(y))
 
         # print(center)
-        return center
+        return (center, amountOfFrames)
+
+    def getPuckPositionAlways(self):
+        # img = self.getImage()
+        # img, amountOfFrames = self.getField.getImage()
+
+        # img = cv2.imread("Processing/hsv_TestImages/hsv_test_1.jpeg", 1)
+        while True:
+            if cv2.waitKey(1) == ord("q"):
+                break
+
+            img, amountOfFrames = self.getField.getImage()
+            if amountOfFrames == 0:
+                continue
+            # print(amountOfFrames)
+
+            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+            mask = cv2.inRange(hsv, self.lower_boundary, self.upper_boundary)
+
+            # We use medianBlur to get rid of so calles salt and pepper noise.
+            # If our mask gets other pixels besides the puck, we hope to eliminate them as best as possible with this "filter"
+            mask_blur = cv2.medianBlur(mask, 19)
+
+            contours, hierarchy = cv2.findContours(mask_blur, 1, 2)
+            if not contours:
+                return None
+            cnt = contours[0]
+
+            # We use minEnclosingCircle(), because if part of the puck is not detected (perhaps an arm above the puck), we might still be
+            # able to get the correct center
+            # We also tried cv2.HoughCircles as seen in "testHSV.py", but somehow it doesn't work.
+            # It might be faster than this method though. So if you are able to get the center with cv2.HoughCircles... give it a try
+            (x, y), radius = cv2.minEnclosingCircle(cnt)
+            center = (int(x), int(y))
+
+            print(center)
+        return (center, amountOfFrames)
 
     # Get the correct (only the field) image from ProcessField
     def getImage(self):
-        img = cv2.imread("Processing/hsv_TestImages/hsv_test_1.jpeg", 1)
+        # img = cv2.imread("Processing/hsv_TestImages/hsv_test_1.jpeg", 1)
+        img = self.getField.getImage()
         return img
-        self.videoStream.getImage()
 
 
 if __name__ == "__main__":
@@ -141,9 +173,8 @@ if __name__ == "__main__":
 
     test = ProcessPuckHSV()
     test.setHSV()
-    position = test.getPuckPosition()
+    position = test.getPuckPositionAlways()
     print(position)
-    # test.printBound()
 
     print("EXIT")
     exit

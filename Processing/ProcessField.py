@@ -22,7 +22,9 @@ img = cv2.resize(img, (0, 0), fx=0.7, fy=0.7)
 class ProcessField:
     def __init__(self, videoStream=0):
         self.videostream = videoStream
-        self.image = img
+        frame, amountOfFrames = self.videostream.read()
+        # frame = cv2.resize(frame, (0, 0), fx=0.7, fy=0.7)
+        self.image = frame
         self.ptHuman = []
         self.ptRobot = []
 
@@ -43,9 +45,6 @@ class ProcessField:
         self.flipImage = False
 
         self.choosenCorner = False
-
-    def click_test(event, x, y, flags, param):
-        print("Test")
 
     def click_event(self, event, x, y, flags, param):
         # checking for left mouse clicks
@@ -82,6 +81,7 @@ class ProcessField:
 
     def chooseCorner(self):
         # print(self.image)
+
         cv2.imshow("image", self.image)
         cv2.setMouseCallback("image", self.click_event)
         cv2.waitKey(0)
@@ -261,7 +261,9 @@ class ProcessField:
 
         else:"""
 
-        img = self.videostream.read()
+        img, amountOfFrames = self.videostream.read()
+        if amountOfFrames == 0:
+            return (0, 0)
         M = cv2.getPerspectiveTransform(self.pts1, self.pts2)
         dst = cv2.warpPerspective(img, M, (self.height, self.length))
 
@@ -275,7 +277,7 @@ class ProcessField:
         if self.flipImage == True:
             dst = cv2.flip(dst, 0)
 
-        return dst
+        return (dst, amountOfFrames)
 
 
 if __name__ == "__main__":

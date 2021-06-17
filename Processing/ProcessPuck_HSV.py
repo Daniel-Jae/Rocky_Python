@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from Camera.cameraOutput import VideoOutput
 
 from Constants import constants
 
@@ -127,7 +128,8 @@ class ProcessPuckHSV:
 
     def getPuckPositionAlways(self):
         # img = self.getImage()
-        # img, amountOfFrames = self.getField.getImage()
+        img, amountOfFrames = self.getField.getImage()
+        video_shower = VideoOutput(img).start()
 
         # img = cv2.imread("Processing/hsv_TestImages/hsv_test_1.jpeg", 1)
         while True:
@@ -159,6 +161,10 @@ class ProcessPuckHSV:
             center = (int(x), int(y))
 
             print(center)
+
+            cv2.circle(img, center, radius, (255, 0, 0), 2)
+            video_shower.frame = img
+
         return (center, amountOfFrames)
 
     # Get the correct (only the field) image from ProcessField

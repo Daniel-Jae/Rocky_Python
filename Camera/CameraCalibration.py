@@ -26,7 +26,7 @@ class CameraCalibration:
         answerCalibration = None
         while answerCalibration not in ("1", "2", "3"):
             answerCalibration = input(
-                "Keine Kalibrierung -> 1, Kalibrierung laden -> 2, kalibrieren -> 3"
+                "Keine Kalibrierung -> 1, Kalibrierung laden -> 2, kalibrieren -> 3:   "
             )
             if answerCalibration == "1":
                 break
@@ -34,8 +34,12 @@ class CameraCalibration:
                 answerFile = None
                 showFiles = None
                 files = glob.glob("*.npz")
+                idx = 0
                 for idx, one_file in enumerate(files, start=1):
-                    showFiles = showFiles + idx + ": " + one_file + "; "
+                    if not showFiles:
+                        showFiles = str(idx) + ": " + one_file + "; "
+                    else:
+                        showFiles = showFiles + str(idx) + ": " + one_file + "; "
                 if not showFiles:
                     print("Keine Datei vorhanden")
                     self.choose()
@@ -52,6 +56,7 @@ class CameraCalibration:
                         self.distortion = data["dst"]
                     else:
                         print("Bitte gebe Sie eine passende Zahl ein:")
+                break
 
             elif answerCalibration == "3":
                 self.getImages()
@@ -59,6 +64,7 @@ class CameraCalibration:
                 self.calibrate()
                 self.showUndistortImage()
                 self.saveParameter()
+                break
             else:
                 print("Bitte geben Sie 1, 2 oder 3 ein:")
 

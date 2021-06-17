@@ -148,7 +148,7 @@ class ProcessPuckHSV:
 
             contours, hierarchy = cv2.findContours(mask_blur, 1, 2)
             if not contours:
-                return None
+                continue
             cnt = contours[0]
 
             # We use minEnclosingCircle(), because if part of the puck is not detected (perhaps an arm above the puck), we might still be

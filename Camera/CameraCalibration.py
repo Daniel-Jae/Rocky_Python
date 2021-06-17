@@ -71,10 +71,12 @@ class CameraCalibration:
         dst = cv2.undistort(
             self.images[0], self.cameraMatrix, self.distortion, None, self.newcameramtx
         )
+        # You can crop the image here according to the calibration.
+        # We will crop the image later anyway for the field, so  we don't use it (so far)
         # crop the image
-        x, y, w, h = self.roi
-        dst = dst[y : y + h, x : x + w]
-        cv2.imshow("calibresult.png", dst)
+        # x, y, w, h = self.roi
+        # dst = dst[y : y + h, x : x + w]
+        cv2.imshow("undistorted", dst)
         cv2.waitKey(0)
 
     def calibrate(self):

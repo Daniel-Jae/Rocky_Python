@@ -47,9 +47,9 @@ class CameraCalibration:
                     answerFile = input(showFiles)
                     # Check if input can be converted to int
                     try:
-                        int(answerFile)
+                        answerFile = int(answerFile)
                     except ValueError:
-                        return False
+                        continue
                     if answerFile in range(1, idx):
                         data = np.load(files[answerFile - 1])
                         self.cameraMatrix = data["mtx"]

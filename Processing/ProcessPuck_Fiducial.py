@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from Camera.cameraOutput import VideoOutput
 
 from Constants import constants
 
@@ -41,7 +42,7 @@ class ProcessPuck:
                     # draw the ArUco marker ID on the img
 
                     # print(cX, cY)
-                    return cX, cY
+                    return (cX, cY)
 
     def getImage(self):
         self.videoStream.getImage()
@@ -96,6 +97,49 @@ class ProcessPuck:
                     cv2.waitKey(0)
 
                     print("Test")
+
+    def getPuckPositionAlways(self):
+        img, amountOfFrames = self.getField.getImage()
+        video_shower = VideoOutput(img).start()
+
+        # img = cv2.imread("Processing/hsv_TestImages/hsv_test_1.jpeg", 1)
+        while True:
+            if cv2.waitKey(1) == ord("q"):
+                break
+
+            img, amountOfFrames = self.getField.getImage()
+            if amountOfFrames == 0:
+                continue
+            (corners, ids, rejected) = cv2.aruco.detectMarkers(
+                img, self.arucoDict, parameters=self.arucoParams
+            )
+
+        # verify *at least* one ArUco marker was detected
+        if len(corners) > 0:
+            # flatten the ArUco IDs list
+            ids = ids.flatten()
+            # loop over the detected ArUCo corners
+            for (markerCorner, markerID) in zip(corners, ids):
+                if markerID == constants.PUCK_ARUCO_ID:
+                    # extract the marker corners (which are always returned in
+                    # top-left, top-right, bottom-right, and bottom-left order)
+                    corners = markerCorner.reshape((4, 2))
+                    (topLeft, topRight, bottomRight, bottomLeft) = corners
+                    # convert each of the (x, y)-coordinate pairs to integers
+                    bottomRight = (int(bottomRight[0]), int(bottomRight[1]))
+                    topLeft = (int(topLeft[0]), int(topLeft[1]))
+
+                    # compute the center (x, y)-coordinates of the ArUco marker
+                    cX = int((topLeft[0] + bottomRight[0]) / 2.0)
+                    cY = int((topLeft[1] + bottomRight[1]) / 2.0)
+                    # draw the ArUco marker ID on the img
+
+                    center = (int(cX), int(cY))
+                    print(center)
+                    cv2.circle(img, center, int(30), (255, 0, 0), 2)
+                    video_shower.frame = img
+
+        return (center, amountOfFrames)
 
 
 if __name__ == "__main__":

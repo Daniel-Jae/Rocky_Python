@@ -13,8 +13,10 @@ class CameraCalibration:
         self.chessboardSize = chessboard
         self.images = []
 
-    def showUndistortImage(self):
+    def saveParameter(self):
+        pass
 
+    def showUndistortImage(self):
         dst = cv2.undistort(
             self.images[0], self.cameraMatrix, self.distortion, None, self.newcameramtx
         )
@@ -50,14 +52,27 @@ class CameraCalibration:
                 corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
                 imgpoints.append(corners)
                 # Draw and display the corners
-                cv2.drawChessboardCorners(fname, (self.chessboardSize), corners2, ret)
-                cv2.imshow("img", fname)
+
+                drawCorners = fname.copy()
+                cv2.drawChessboardCorners(
+                    drawCorners, (self.chessboardSize), corners2, ret
+                )
+                cv2.imshow("img", drawCorners)
                 cv2.waitKey(500)
         cv2.destroyAllWindows()
 
         ret, self.cameraMatrix, self.distortion, rvecs, tvecs = cv2.calibrateCamera(
             objpoints, imgpoints, gray.shape[::-1], None, None
         )
+
+        mean_error = 0
+        for i in range(len(objpoints)):
+            imgpoints2, _ = cv2.projectPoints(
+                objpoints[i], rvecs[i], tvecs[i], self.cameraMatrix, self.distortion
+            )
+            error = cv2.norm(imgpoints[i], imgpoints2, cv2.NORM_L2) / len(imgpoints2)
+            mean_error += error
+        print("total error: {}".format(mean_error / len(objpoints)))
 
         h, w = gray.shape[:2]
         self.newcameramtx, self.roi = cv2.getOptimalNewCameraMatrix(
@@ -104,3 +119,4 @@ if __name__ == "__main__":
     video.getImages()
     video.showImages()
     video.calibrate()
+    video.showUndistortImage()

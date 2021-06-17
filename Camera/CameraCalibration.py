@@ -13,11 +13,11 @@ class CameraCalibration:
         # self.resolution = resolution
         self.chessboardSize = chessboard
         self.images = []
-        self.cameraMatrix = None
-        self.distortion = None
+        self.cameraMatrix = np.array([])
+        self.distortion = np.array([])
 
     def getCalibration(self):
-        if not self.cameraMatrix or not self.distortion:
+        if self.cameraMatrix.size == 0 or self.distortion.size == 0:
             return None
         else:
             return (self.cameraMatrix, self.distortion)
@@ -26,7 +26,7 @@ class CameraCalibration:
         answerCalibration = None
         while answerCalibration not in ("1", "2", "3"):
             answerCalibration = input(
-                "Keine Kalibrierung -> 1, Kalibrierung laden -> 2, kalibrieren -> 3:   "
+                "1 -> Keine Kalibrierung, 2 -> Kalibrierung laden, 3 -> kalibrieren:  Input-> "
             )
             if answerCalibration == "1":
                 break
@@ -37,20 +37,22 @@ class CameraCalibration:
                 idx = 0
                 for idx, one_file in enumerate(files, start=1):
                     if not showFiles:
-                        showFiles = str(idx) + ": " + one_file + "; "
+                        showFiles = str(idx) + " -> " + one_file + "; "
                     else:
                         showFiles = showFiles + str(idx) + ": " + one_file + "; "
                 if not showFiles:
                     print("Keine Datei vorhanden")
                     self.choose()
-                while answerFile not in range(1, idx):
+                showFiles = showFiles + "  Input-> "
+                while answerFile not in range(1, idx + 1):
                     answerFile = input(showFiles)
                     # Check if input can be converted to int
                     try:
                         answerFile = int(answerFile)
                     except ValueError:
+                        print("Bitte gebe Sie eine Zahl (Integer) ein:")
                         continue
-                    if answerFile in range(1, idx):
+                    if answerFile in range(1, idx + 1):
                         data = np.load(files[answerFile - 1])
                         self.cameraMatrix = data["mtx"]
                         self.distortion = data["dst"]
@@ -176,6 +178,7 @@ if __name__ == "__main__":
 
     video = CameraCalibration()
     video.choose()
+    video.getImages()
     # video.getImages()
     # video.showImages()
     # video.calibrate()

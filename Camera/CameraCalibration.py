@@ -13,6 +13,17 @@ class CameraCalibration:
         self.chessboardSize = chessboard
         self.images = []
 
+    def showUndistortImage(self):
+
+        dst = cv2.undistort(
+            self.images[0], self.cameraMatrix, self.distortion, None, self.newcameramtx
+        )
+        # crop the image
+        x, y, w, h = self.roi
+        dst = dst[y : y + h, x : x + w]
+        cv2.imshow("calibresult.png", dst)
+        cv2.waitKey(0)
+
     def calibrate(self):
         # termination criteria
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -43,6 +54,15 @@ class CameraCalibration:
                 cv2.imshow("img", fname)
                 cv2.waitKey(500)
         cv2.destroyAllWindows()
+
+        ret, self.cameraMatrix, self.distortion, rvecs, tvecs = cv2.calibrateCamera(
+            objpoints, imgpoints, gray.shape[::-1], None, None
+        )
+
+        h, w = gray.shape[:2]
+        self.newcameramtx, self.roi = cv2.getOptimalNewCameraMatrix(
+            self.cameraMatrix, self.distortion, (w, h), 1, (w, h)
+        )
 
     def showImages(self):
         for fname in self.images:

@@ -1,5 +1,7 @@
 import cv2
+import glob
 import numpy as np
+
 
 # import concurrent.futures
 import time
@@ -7,14 +9,63 @@ import time
 
 class CameraCalibration:
     def __init__(self, chessboard=(9, 6), camera=0):
-        # initialize the camera and stream
         self.camera = camera
         # self.resolution = resolution
         self.chessboardSize = chessboard
         self.images = []
+        self.cameraMatrix = None
+        self.distortion = None
+
+    def getCalibration(self):
+        if not self.cameraMatrix or not self.distortion:
+            return None
+        else:
+            return (self.cameraMatrix, self.distortion)
+
+    def choose(self):
+        answerCalibration = None
+        while answerCalibration not in ("1", "2", "3"):
+            answerCalibration = input(
+                "Keine Kalibrierung -> 1, Kalibrierung laden -> 2, kalibrieren -> 3"
+            )
+            if answerCalibration == "1":
+                break
+            elif answerCalibration == "2":
+                answerFile = None
+                showFiles = None
+                files = glob.glob("*.npz")
+                for idx, one_file in enumerate(files, start=1):
+                    showFiles = showFiles + idx + ": " + one_file + "; "
+                if not showFiles:
+                    print("Keine Datei vorhanden")
+                    self.choose()
+                while answerFile not in range(1, idx):
+                    answerFile = input(showFiles)
+                    # Check if input can be converted to int
+                    try:
+                        int(answerFile)
+                    except ValueError:
+                        return False
+                    if answerFile in range(1, idx):
+                        data = np.load(files[answerFile - 1])
+                        self.cameraMatrix = data["mtx"]
+                        self.distortion = data["dst"]
+                    else:
+                        print("Bitte gebe Sie eine passende Zahl ein:")
+
+            elif answerCalibration == "3":
+                self.getImages()
+                self.showImages()
+                self.calibrate()
+                self.showUndistortImage()
+                self.saveParameter()
+            else:
+                print("Bitte geben Sie 1, 2 oder 3 ein:")
 
     def saveParameter(self):
-        pass
+        filename = input("Name der Datei in der die Daten gespeichert werden: ")
+        filename = filename + ".npz"
+        np.savez(filename, mtx=self.cameraMatrix, dst=self.distortion)
 
     def showUndistortImage(self):
         dst = cv2.undistort(
@@ -116,7 +167,8 @@ if __name__ == "__main__":
     pass
 
     video = CameraCalibration()
-    video.getImages()
-    video.showImages()
-    video.calibrate()
-    video.showUndistortImage()
+    video.choose()
+    # video.getImages()
+    # video.showImages()
+    # video.calibrate()
+    # video.showUndistortImage()

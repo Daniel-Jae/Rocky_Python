@@ -162,15 +162,16 @@ class ProcessPuckHSV:
 
             print(center)
 
-            cv2.circle(img, center, radius, (255, 0, 0), 2)
+            cv2.circle(img, center, int(radius), (255, 0, 0), 2)
             video_shower.frame = img
 
+        video_shower.stop()
         return (center, amountOfFrames)
 
     # Get the correct (only the field) image from ProcessField
     def getImage(self):
         # img = cv2.imread("Processing/hsv_TestImages/hsv_test_1.jpeg", 1)
-        img = self.getField.getImage()
+        img, test = self.getField.getImage()
         return img
 
 

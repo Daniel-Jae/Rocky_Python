@@ -139,6 +139,7 @@ class ProcessPuck:
                     cv2.circle(img, center, int(30), (255, 0, 0), 2)
                     video_shower.frame = img
 
+        video_shower.stop()
         return (center, amountOfFrames)
 
 

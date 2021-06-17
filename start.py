@@ -6,6 +6,9 @@ from Processing.ProcessField import ProcessField
 from Processing.ProcessPuck_Fiducial import ProcessPuck
 from Processing.ProcessPuck_HSV import ProcessPuckHSV
 
+import cv2
+import numpy as np
+
 
 # ROOT_DIR = os.path.dirname(os.path.abspath("start.py"))
 # print(ROOT_DIR)
@@ -19,9 +22,27 @@ newProcessField = ProcessField(newVideoStream)
 
 newProcessField.chooseCorner()
 
-newProcessPuckHSV = ProcessPuckHSV(newProcessField)
+x = 0
 
-newProcessPuckHSV.getPuckPositionAlways()
+if x == 0:
+
+    newProcessPuckHSV = ProcessPuckHSV(newProcessField)
+
+    newProcessPuckHSV.setHSV()
+
+    newProcessPuckHSV.getPuckPositionAlways()
+
+else:
+
+    newProcessPuckFiducial = ProcessPuck(newProcessField)
+
+    newProcessPuckFiducial.getPuckPositionAlways()
+
+
+newVideoStream.stop()
+
+cv2.destroyAllWindows()
+
 
 # test.start()
 # test.update()

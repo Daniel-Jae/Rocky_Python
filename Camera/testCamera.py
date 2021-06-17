@@ -1,6 +1,7 @@
 from datetime import datetime
 import argparse
 import cv2
+from threading import Thread
 
 
 class CountsPerSec:
@@ -24,6 +25,32 @@ class CountsPerSec:
     def countsPerSec(self):
         elapsed_time = (datetime.now() - self._start_time).total_seconds()
         return self._num_occurrences / elapsed_time
+
+
+class VideoGet:
+    """
+    Class that continuously gets frames from a VideoCapture object
+    with a dedicated thread.
+    """
+
+    def __init__(self, src=0):
+        self.stream = cv2.VideoCapture(src)
+        (self.grabbed, self.frame) = self.stream.read()
+        self.stopped = False
+
+    def start(self):
+        Thread(target=self.get, args=()).start()
+        return self
+
+    def get(self):
+        while not self.stopped:
+            if not self.grabbed:
+                self.stop()
+            else:
+                (self.grabbed, self.frame) = self.stream.read()
+
+    def stop(self):
+        self.stopped = True
 
 
 def putIterationsPerSec(frame, iterations_per_sec):
@@ -56,3 +83,26 @@ def noThreading(source=0):
         frame = putIterationsPerSec(frame, cps.countsPerSec())
         cv2.imshow("Video", frame)
         cps.increment()
+
+
+def threadVideoGet(source=0):
+    """
+    Dedicated thread for grabbing video frames with VideoGet object.
+    Main thread shows video frames.
+    """
+
+    video_getter = VideoGet(source).start()
+    cps = CountsPerSec().start()
+
+    while True:
+        if (cv2.waitKey(1) == ord("q")) or video_getter.stopped:
+            video_getter.stop()
+            break
+
+        frame = video_getter.frame
+        frame = putIterationsPerSec(frame, cps.countsPerSec())
+        cv2.imshow("Video", frame)
+        cps.increment()
+
+
+threadVideoGet(0)

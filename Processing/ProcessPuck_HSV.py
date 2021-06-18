@@ -150,6 +150,7 @@ class ProcessPuckHSV:
 
             contours, hierarchy = cv2.findContours(mask_blur, 1, 2)
             if not contours:
+                video_shower.frame = img
                 continue
             cnt = contours[0]
 
@@ -157,12 +158,23 @@ class ProcessPuckHSV:
             # able to get the correct center
             # We also tried cv2.HoughCircles as seen in "testHSV.py", but somehow it doesn't work.
             # It might be faster than this method though. So if you are able to get the center with cv2.HoughCircles... give it a try
-            (x, y), radius = cv2.minEnclosingCircle(cnt)
-            center = (int(x), int(y))
+            
+            M = cv2.moments(cnt)
+            # Check for null-divison
+            if M["m00"] == 0:
+                video_shower.frame = img
+                continue
+            cx = int(M["m10"] / M["m00"])
+            cy = int(M["m01"] / M["m00"])
+
+            center = (cx, cy)
+            
+            #(x, y), radius = cv2.minEnclosingCircle(cnt)
+            #center = (int(x), int(y))
 
             print(center)
 
-            cv2.circle(img, center, int(radius), (255, 0, 0), 2)
+            cv2.circle(img, center, 20, (255, 0, 0), 2)
             video_shower.frame = img
 
         video_shower.stop()

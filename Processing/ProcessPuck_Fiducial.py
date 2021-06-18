@@ -5,8 +5,8 @@ from Camera.cameraOutput import VideoOutput
 
 from Constants import constants
 
-img = cv2.imread("Processing/fiducial_TestImages/fid_test_7.jpeg", 1)
-img = cv2.resize(img, (0, 0), fx=0.7, fy=0.7)
+#img = cv2.imread("Processing/fiducial_TestImages/fid_test_7.jpeg", 1)
+#img = cv2.resize(img, (0, 0), fx=0.7, fy=0.7)
 
 
 class ProcessPuck:
@@ -50,7 +50,7 @@ class ProcessPuck:
     # SHOWMARKER for debugging
     def showMarker(self):
         while True:
-            img = self.getField.getImage()
+            img, test = self.getField.getImage()
             (corners, ids, rejected) = cv2.aruco.detectMarkers(
                 img, self.arucoDict, parameters=self.arucoParams
             )
@@ -108,36 +108,40 @@ class ProcessPuck:
                 break
 
             img, amountOfFrames = self.getField.getImage()
-            if amountOfFrames == 0:
-                continue
+            #if amountOfFrames == 0:
+            #    continue
             (corners, ids, rejected) = cv2.aruco.detectMarkers(
                 img, self.arucoDict, parameters=self.arucoParams
             )
 
-        # verify *at least* one ArUco marker was detected
-        if len(corners) > 0:
-            # flatten the ArUco IDs list
-            ids = ids.flatten()
-            # loop over the detected ArUCo corners
-            for (markerCorner, markerID) in zip(corners, ids):
-                if markerID == constants.PUCK_ARUCO_ID:
-                    # extract the marker corners (which are always returned in
-                    # top-left, top-right, bottom-right, and bottom-left order)
-                    corners = markerCorner.reshape((4, 2))
-                    (topLeft, topRight, bottomRight, bottomLeft) = corners
-                    # convert each of the (x, y)-coordinate pairs to integers
-                    bottomRight = (int(bottomRight[0]), int(bottomRight[1]))
-                    topLeft = (int(topLeft[0]), int(topLeft[1]))
+            # verify *at least* one ArUco marker was detected
+            if len(corners) > 0:
+                print("Marker detected")
+                # flatten the ArUco IDs list
+                ids = ids.flatten()
+                # loop over the detected ArUCo corners
+                for (markerCorner, markerID) in zip(corners, ids):
+                    
+                        # extract the marker corners (which are always returned in
+                        # top-left, top-right, bottom-right, and bottom-left order)
+                        corners = markerCorner.reshape((4, 2))
+                        (topLeft, topRight, bottomRight, bottomLeft) = corners
+                        # convert each of the (x, y)-coordinate pairs to integers
+                        bottomRight = (int(bottomRight[0]), int(bottomRight[1]))
+                        topLeft = (int(topLeft[0]), int(topLeft[1]))
 
-                    # compute the center (x, y)-coordinates of the ArUco marker
-                    cX = int((topLeft[0] + bottomRight[0]) / 2.0)
-                    cY = int((topLeft[1] + bottomRight[1]) / 2.0)
-                    # draw the ArUco marker ID on the img
+                        # compute the center (x, y)-coordinates of the ArUco marker
+                        cX = int((topLeft[0] + bottomRight[0]) / 2.0)
+                        cY = int((topLeft[1] + bottomRight[1]) / 2.0)
+                        # draw the ArUco marker ID on the img
 
-                    center = (int(cX), int(cY))
-                    print(center)
-                    cv2.circle(img, center, int(30), (255, 0, 0), 2)
-                    video_shower.frame = img
+                        center = (int(cX), int(cY))
+                        print(center)
+                        cv2.circle(img, center, int(30), (255, 0, 0), 2)
+                        video_shower.frame = img
+            else:
+                print("No-Marker")
+                video_shower.frame = img
 
         video_shower.stop()
         return (center, amountOfFrames)

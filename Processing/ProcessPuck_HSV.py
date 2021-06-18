@@ -158,7 +158,7 @@ class ProcessPuckHSV:
             # able to get the correct center
             # We also tried cv2.HoughCircles as seen in "testHSV.py", but somehow it doesn't work.
             # It might be faster than this method though. So if you are able to get the center with cv2.HoughCircles... give it a try
-            
+
             M = cv2.moments(cnt)
             # Check for null-divison
             if M["m00"] == 0:
@@ -168,9 +168,9 @@ class ProcessPuckHSV:
             cy = int(M["m01"] / M["m00"])
 
             center = (cx, cy)
-            
-            #(x, y), radius = cv2.minEnclosingCircle(cnt)
-            #center = (int(x), int(y))
+
+            # (x, y), radius = cv2.minEnclosingCircle(cnt)
+            # center = (int(x), int(y))
 
             print(center)
 

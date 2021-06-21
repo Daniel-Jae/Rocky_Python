@@ -66,8 +66,9 @@ class ProcessPuckHSV:
         # "while True", so that the images are getting "refreshed" everytime the hsv values change
         while True:
             img = self.getImage()
+            
 
-            img = cv2.resize(img, (0, 0), fx=0.3, fy=0.3)
+            img = cv2.resize(img, (0, 0), fx=0.1, fy=0.1)
 
             hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 

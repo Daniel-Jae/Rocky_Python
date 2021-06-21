@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-from constants import *
+#from constants import *
 
 # import concurrent.futures
 # import threading
@@ -32,7 +32,7 @@ class ProcessField:
         self.pts1 = np.float32([[56, 65], [368, 52], [28, 387], [389, 390]])
 
         # Points(And therefore dimensions) for the destination-image.
-        self.pts2 = np.float32([[0, 0], [640, 0], [0, 400], [640, 400]])
+        self.pts2 = np.float32([[0, 0], [2496, 0], [0, 1560], [2496, 1560]])
 
         self.height = int(self.pts2[3, 0])
         self.length = int(self.pts2[3, 1])

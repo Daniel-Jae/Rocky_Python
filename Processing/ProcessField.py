@@ -8,15 +8,15 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-#from constants import *
+# from constants import *
 
 # import concurrent.futures
 # import threading
 # import time
 
 # Test-Images
-img = cv2.imread("Processing/field_TestImages/test_image.jpeg", 1)
-img = cv2.resize(img, (0, 0), fx=0.7, fy=0.7)
+# img = cv2.imread("Processing/field_TestImages/test_image.jpeg", 1)
+# img = cv2.resize(img, (0, 0), fx=0.7, fy=0.7)
 
 
 class ProcessField:

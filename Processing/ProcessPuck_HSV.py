@@ -8,7 +8,7 @@ from Constants import constants
 
 class ProcessPuckHSV:
     def __init__(self, processField=0):
-        self.getField = processField
+        self.field = processField
 
         self.lower_boundary = np.array([61, 94, 40])
         self.upper_boundary = np.array([90, 255, 144])
@@ -66,7 +66,8 @@ class ProcessPuckHSV:
         # "while True", so that the images are getting "refreshed" everytime the hsv values change
         while True:
             img = self.getImage()
-            
+            if not img:
+                continue
 
             img = cv2.resize(img, (0, 0), fx=0.1, fy=0.1)
 
@@ -100,7 +101,9 @@ class ProcessPuckHSV:
 
     def getPuckPosition(self):
         # img = self.getImage()
-        img, amountOfFrames = self.getField.getImage()
+        img, amountOfFrames = self.field.getImage()
+        if amountOfFrames == 0:
+            return ((0, 0), 0)
 
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
@@ -113,7 +116,7 @@ class ProcessPuckHSV:
         contours, hierarchy = cv2.findContours(mask_blur, 1, 2)
 
         if not contours:
-            return None
+            return ((0, 0), 0)
 
         cnt = contours[0]
 
@@ -121,15 +124,25 @@ class ProcessPuckHSV:
         # able to get the correct center
         # We also tried cv2.HoughCircles as seen in "testHSV.py", but somehow it doesn't work.
         # It might be faster than this method though. So if you are able to get the center with cv2.HoughCircles... give it a try
-        (x, y), radius = cv2.minEnclosingCircle(cnt)
-        center = (int(x), int(y))
+        # (x, y), radius = cv2.minEnclosingCircle(cnt)
+        # center = (int(x), int(y))
 
+        M = cv2.moments(cnt)
+        # Check for null-divison
+        if M["m00"] == 0:
+            return ((0, 0), 0)
+        cx = int(M["m10"] / M["m00"])
+        cy = int(M["m01"] / M["m00"])
+
+        center = (cx, cy)
         # print(center)
         return (center, amountOfFrames)
 
     def getPuckPositionAlways(self):
         # img = self.getImage()
-        img, amountOfFrames = self.getField.getImage()
+        img, amountOfFrames = self.field.getImage()
+        while amountOfFrames == 0:
+            img, amountOfFrames = self.field.getImage()
         video_shower = VideoOutput(img).start()
 
         # img = cv2.imread("Processing/hsv_TestImages/hsv_test_1.jpeg", 1)
@@ -137,7 +150,7 @@ class ProcessPuckHSV:
             if cv2.waitKey(1) == ord("q"):
                 break
 
-            img, amountOfFrames = self.getField.getImage()
+            img, amountOfFrames = self.field.getImage()
             if amountOfFrames == 0:
                 continue
             # print(amountOfFrames)
@@ -184,8 +197,40 @@ class ProcessPuckHSV:
     # Get the correct (only the field) image from ProcessField
     def getImage(self):
         # img = cv2.imread("Processing/hsv_TestImages/hsv_test_1.jpeg", 1)
-        img, test = self.getField.getImage()
+        img, amountOfFrames = self.field.getImage()
+        if amountOfFrames == 0:
+            return None
         return img
+
+    def read_position_and_image(self):
+        img, amountOfFrames = self.field.getImage()
+        if amountOfFrames == 0:
+            return (img, (0, 0), 0)
+
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(hsv, self.lower_boundary, self.upper_boundary)
+
+        # We use medianBlur to get rid of so calles salt and pepper noise.
+        # If our mask gets other pixels besides the puck, we hope to eliminate them as best as possible with this "filter"
+        mask_blur = cv2.medianBlur(mask, 19)
+
+        contours, hierarchy = cv2.findContours(mask_blur, 1, 2)
+
+        if not contours:
+            return ((0, 0), 0)
+
+        cnt = contours[0]
+
+        M = cv2.moments(cnt)
+        # Check for null-divison
+        if M["m00"] == 0:
+            return ((0, 0), 0)
+        cx = int(M["m10"] / M["m00"])
+        cy = int(M["m01"] / M["m00"])
+
+        center = (cx, cy)
+        # print(center)
+        return (img, center, amountOfFrames)
 
 
 if __name__ == "__main__":

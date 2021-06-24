@@ -5,6 +5,7 @@ from Camera.CameraStream import VideoStream
 from Processing.ProcessField import ProcessField
 from Processing.ProcessPuck_Fiducial import ProcessPuck
 from Processing.ProcessPuck_HSV import ProcessPuckHSV
+from Prediction.pathPrediction import PathPrediction
 
 import cv2
 import numpy as np
@@ -30,7 +31,7 @@ if x == 0:
 
     newProcessPuckHSV.setHSV()
 
-    newProcessPuckHSV.getPuckPositionAlways()
+    # newProcessPuckHSV.getPuckPositionAlways()
 
 else:
 
@@ -38,6 +39,9 @@ else:
 
     newProcessPuckFiducial.getPuckPositionAlways()
 
+new_path_prediction = PathPrediction(newProcessPuckHSV)
+
+new_path_prediction.draw_predicted_path()
 
 newVideoStream.stop()
 

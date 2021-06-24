@@ -8,11 +8,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-# from constants import *
-
-# import concurrent.futures
-# import threading
-# import time
+from Constants import constants
 
 # Test-Images
 # img = cv2.imread("Processing/field_TestImages/test_image.jpeg", 1)
@@ -28,15 +24,28 @@ class ProcessField:
         self.ptHuman = []
         self.ptRobot = []
 
-        # Points in the source image: Corners of the game-field
+        # Points in the source image: Corners of the game-field. values getting set by self.chooseCorner()
         self.pts1 = np.float32([[56, 65], [368, 52], [28, 387], [389, 390]])
 
         # Points(And therefore dimensions) for the destination-image.
-        self.pts2 = np.float32([[0, 0], [2496, 0], [0, 1560], [2496, 1560]])
-
+        self.pts2 = np.float32(
+            [
+                [0, 0],
+                [constants.FIELD_HEIGHT, 0],
+                [0, constants.FIELD_WIDTH],
+                [constants.FIELD_HEIGHT, constants.FIELD_WIDTH],
+            ]
+        )
+        self.pts2NotSuitable = np.float32(
+            [
+                [0, 0],
+                [constants.FIELD_WIDTH, 0],
+                [0, constants.FIELD_HEIGHT],
+                [constants.FIELD_WIDTH, constants.FIELD_HEIGHT],
+            ]
+        )
         self.height = int(self.pts2[3, 0])
         self.length = int(self.pts2[3, 1])
-        self.pts2NotSuitable = np.float32([[0, 0], [400, 0], [0, 640], [400, 640]])
         # the amount of rotation(clock-wise)
         self.rotate = 0
         # True -> larger width than height (Goal-line left and right); False -> larger height than width (Goal-line top and bottom)
@@ -261,9 +270,9 @@ class ProcessField:
 
         else:"""
 
-        img, amountOfFrames = self.videostream.read()
-        # if amountOfFrames == 0:
-        #    return (0, 0)
+        img, amountOfFrames = self.videostream.readWithFrames()
+        if amountOfFrames == 0:
+            return (0, 0)
         M = cv2.getPerspectiveTransform(self.pts1, self.pts2)
         dst = cv2.warpPerspective(img, M, (self.height, self.length))
 

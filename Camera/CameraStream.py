@@ -14,6 +14,8 @@ class VideoStream:
         self.framesSinceLastRequest = 0
         self.framerate = framerate
 
+        self.currentTime, self.previousTime = 0
+
     def calculateFPS():
         # Calculate the "real" Frames of the Camera
         video = cv2.VideoCapture(0)
@@ -35,6 +37,7 @@ class VideoStream:
         return fps
 
     def start(self):
+        self.previousTime = time.time()
         Thread(target=self.get, args=()).start()
         return self
 
@@ -47,15 +50,31 @@ class VideoStream:
                 (self.grabbed, self.frame) = self.stream.read()
         print("Camera stopped.")
 
-    def read(self):
-        # return the newest frame
+    # return the newest frame -if available- and return the amount of time -in seconds- that passed since the last request
+    def readWithTime(self):
         framesSinceLastRequest = self.framesSinceLastRequest
 
-        self.framesSinceLastRequest = 0
+        if framesSinceLastRequest == 0:
+            return (self.frame, framesSinceLastRequest)
+        else:
+            self.currentTime = time.time()
+            timeSinceLastRequest = self.currentTime - self.previousTime
+            self.previousTime = self.currentTime
 
-        # cv2.imshow("image", self.frame)
+            self.framesSinceLastRequest = 0
 
-        return (self.frame, framesSinceLastRequest)
+            return (self.frame, timeSinceLastRequest)
+
+    # return the newest frame -if available- and return the amount of frames that passed since the last request
+    def readWithFrames(self):
+        framesSinceLastRequest = self.framesSinceLastRequest
+
+        if framesSinceLastRequest == 0:
+            return (self.frame, framesSinceLastRequest)
+        else:
+            self.framesSinceLastRequest = 0
+
+            return (self.frame, framesSinceLastRequest)
 
     def stop(self):
         self.stopped = True

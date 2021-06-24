@@ -1,9 +1,17 @@
-from math import floor
-
 # ------------- DIMENSIONS -------------
 # Field dimensions in game units
-FIELD_WIDTH = 1000
-FIELD_HEIGHT = 600
+# -----
+# |   |
+# |   | <- height (x)
+# |   |
+# -----
+# <   > <- width (y)
+# Real-Life:
+# Height = 162cm
+# Width = 92,5cm
+# Goal = ...cm
+FIELD_WIDTH = 925
+FIELD_HEIGHT = 1620
 GOAL_SPAN = 240
 CHAMBER_SIZE = 30  # on both size - eg: 30 = 30mm x 30mm
 
@@ -11,31 +19,14 @@ CHAMBER_SIZE = 30  # on both size - eg: 30 = 30mm x 30mm
 PUCK_RADIUS = 32
 STRIKER_RADIUS = 50
 
+# Field dimensions for path prediction
+FIELD_WIDTH_PATH = FIELD_WIDTH - 2 * PUCK_RADIUS
+FIELD_HEIGHT_PATH = FIELD_HEIGHT - 2 * PUCK_RADIUS
+
 # Limits
 YLIMIT = 230
 XLIMIT = 65
 STRIKER_AREA_WIDTH = 446
-CORNER_SAFEGUARD_X = XLIMIT + STRIKER_RADIUS * 2
-CORNER_SAFEGUARD_Y = STRIKER_RADIUS + PUCK_RADIUS * 2
-GOAL_CORNER_SAFEGUARD_X = 0  # STRIKER_RADIUS + PUCK_RADIUS*1.5
-GOAL_CORNER_SAFEGUARD_Y = 0  # STRIKER_RADIUS + PUCK_RADIUS*1.5
-
-# -------------- STRATEGY --------------
-DEFENSE_LINE = STRIKER_RADIUS + PUCK_RADIUS
-STOPPING_LINE = 200
-CLOSE_DISTANCE = PUCK_RADIUS  # what is considered to be "close enough"
 
 # -------------- Aruco --------------
 PUCK_ARUCO_ID = 0
-
-# -------------- MOTORS --------------
-# Striker limitations
-MAX_ACCELERATION = 30000
-MAX_DECELERATION = 100000
-MAX_SPEED = 3000
-KP_GAIN = MAX_DECELERATION / (MAX_SPEED * 2)
-
-# -------------- Data collector --------------
-CLIP_LENGTH = 5  # seconds
-CLIP_BEFORE_AFTER_RATIO = 8 / 10  # cant be zero
-CLIP_FRAMERATE = 15

@@ -20,7 +20,7 @@ class VideoOutput:
 
     def show(self):
         while not self.stopped:
-            frame = cv2.resize(self.frame, (0, 0), fx=0.1, fy=0.1)
+            frame = cv2.resize(self.frame, (0, 0), fx=0.6, fy=0.6)
             cv2.imshow("Video", frame)
             if cv2.waitKey(1) == ord("q"):
                 self.stopped = True

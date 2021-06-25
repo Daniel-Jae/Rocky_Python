@@ -18,7 +18,7 @@ from Constants import constants
 class ProcessField:
     def __init__(self, videoStream=0):
         self.videostream = videoStream
-        frame, amountOfFrames = self.videostream.read()
+        frame, amountOfFrames = self.videostream.readWithFrames()
         # frame = cv2.resize(frame, (0, 0), fx=0.7, fy=0.7)
         self.image = frame
         self.ptHuman = []

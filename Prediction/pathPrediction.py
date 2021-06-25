@@ -20,8 +20,15 @@ class PathPrediction:
         # length of vector -> np.linalg.norm(diffs)... at least in our 1-D Array
         length = np.linalg.norm(diff)
 
-        normalized_vector = diff / length
-        speed = length / self.time_between
+        if length == 0:
+            normalized_vector = np.array([0, 0])
+            speed = 0
+        else:
+            normalized_vector = diff / length
+            if self.time_between == 0:
+                speed = 0
+            else:
+                speed = length / self.time_between
 
         return speed, normalized_vector
 
@@ -87,12 +94,12 @@ class PathPrediction:
                 multiplicator = abs(remaining_distance / direction[1])
                 end_point = start_point + (multiplicator * direction)
                 # TODO: Draw Line from start_point to end_point
-                start_tuple = (start_point[1], start_point[0])
-                end_tuple = (end_point[1], end_point[0])
+                start_tuple = (int(start_point[1]), int(start_point[0]))
+                end_tuple = (int(end_point[1]), int(end_point[0]))
                 cv2.line(img, start_tuple, end_tuple, (255, 0, 0), 5)
             else:
-                direction_before_bounce = direction
-                direction_after_bounce = direction
+                direction_before_bounce = np.copy(direction)
+                direction_after_bounce = np.copy(direction)
                 direction_after_bounce[0] *= -1
                 if predicted_x > 0:
                     for i in range(bounces):
@@ -111,8 +118,8 @@ class PathPrediction:
                                 multiplicator * direction_after_bounce
                             )
                         # TODO: Draw Line from start_point to end_point
-                        start_tuple = (start_point[1], start_point[0])
-                        end_tuple = (end_point[1], end_point[0])
+                        start_tuple = (int(start_point[1]), int(start_point[0]))
+                        end_tuple = (int(end_point[1]), int(end_point[0]))
                         cv2.line(img, start_tuple, end_tuple, (255, 0, 0), 5)
                         start_point = end_point
 
@@ -133,8 +140,8 @@ class PathPrediction:
                                 multiplicator * direction_after_bounce
                             )
                         # TODO: Draw Line from start_point to end_point
-                        start_tuple = (start_point[1], start_point[0])
-                        end_tuple = (end_point[1], end_point[0])
+                        start_tuple = (int(start_point[1]), int(start_point[0]))
+                        end_tuple = (int(end_point[1]), int(end_point[0]))
                         cv2.line(img, start_tuple, end_tuple, (255, 0, 0), 5)
                         start_point = end_point
 
@@ -147,8 +154,8 @@ class PathPrediction:
                 else:
                     end_point = start_point + (multiplicator * direction_after_bounce)
                 # TODO: Draw Line from start_point to end_point
-                start_tuple = (start_point[1], start_point[0])
-                end_tuple = (end_point[1], end_point[0])
+                start_tuple = (int(start_point[1]), int(start_point[0]))
+                end_tuple = (int(end_point[1]), int(end_point[0]))
                 cv2.line(img, start_tuple, end_tuple, (255, 0, 0), 5)
 
             video_shower.frame = img

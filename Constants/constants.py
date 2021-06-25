@@ -15,6 +15,9 @@ FIELD_HEIGHT = 1620
 GOAL_SPAN = 240
 CHAMBER_SIZE = 30  # on both size - eg: 30 = 30mm x 30mm
 
+# Motor dimensions
+MOTOR_WIDTH = 15000
+MOTOR_HEIGHT = 22000
 # Objects sizes in game units
 PUCK_RADIUS = 32
 STRIKER_RADIUS = 50

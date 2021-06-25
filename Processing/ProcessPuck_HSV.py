@@ -66,10 +66,10 @@ class ProcessPuckHSV:
         # "while True", so that the images are getting "refreshed" everytime the hsv values change
         while True:
             img = self.getImage()
-            if not img:
+            if img is None:
                 continue
 
-            img = cv2.resize(img, (0, 0), fx=0.1, fy=0.1)
+            img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
 
             hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
@@ -173,22 +173,29 @@ class ProcessPuckHSV:
             # We also tried cv2.HoughCircles as seen in "testHSV.py", but somehow it doesn't work.
             # It might be faster than this method though. So if you are able to get the center with cv2.HoughCircles... give it a try
 
-            M = cv2.moments(cnt)
-            # Check for null-divison
-            if M["m00"] == 0:
-                video_shower.frame = img
-                continue
-            cx = int(M["m10"] / M["m00"])
-            cy = int(M["m01"] / M["m00"])
+             
+            (x, y), radius = cv2.minEnclosingCircle(cnt)
+            center_img = (int(x), int(y))
 
-            center = (cx, cy)
+
+
+            #M = cv2.moments(cnt)
+            # Check for null-divison
+            #if M["m00"] == 0:
+            #    video_shower.frame = img
+            #    continue
+            #cx = int(M["m10"] / M["m00"])
+            #cy = int(M["m01"] / M["m00"])
+
+            #center_img = (cx, cy) 
+            center = (constants.FIELD_HEIGHT - int(x), constants.FIELD_WIDTH - int(y))
 
             # (x, y), radius = cv2.minEnclosingCircle(cnt)
             # center = (int(x), int(y))
 
             print(center)
 
-            cv2.circle(img, center, 20, (255, 0, 0), 2)
+            cv2.circle(img, center_img, int(radius), (255, 0, 0), 2)
             video_shower.frame = img
 
         video_shower.stop()
@@ -217,18 +224,18 @@ class ProcessPuckHSV:
         contours, hierarchy = cv2.findContours(mask_blur, 1, 2)
 
         if not contours:
-            return ((0, 0), 0)
+            return (img, (0, 0), 0)
 
         cnt = contours[0]
 
         M = cv2.moments(cnt)
         # Check for null-divison
         if M["m00"] == 0:
-            return ((0, 0), 0)
+            return (img, (0, 0), 0)
         cx = int(M["m10"] / M["m00"])
         cy = int(M["m01"] / M["m00"])
 
-        center = (cx, cy)
+        center = (constants.FIELD_HEIGHT - cx, constants.FIELD_WIDTH - cy)
         # print(center)
         return (img, center, amountOfFrames)
 

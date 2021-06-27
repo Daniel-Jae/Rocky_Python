@@ -25,7 +25,7 @@ hsv = True
 
 if hsv == True:
 
-    newProcessPuckHSV = ProcessPuckHSV(newProcessField)
+    newProcessPuckHSV = ProcessPuckHSV(processField=newProcessField, threshold=4)
 
     newProcessPuckHSV.setHSV()
 

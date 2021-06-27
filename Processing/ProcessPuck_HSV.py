@@ -130,9 +130,9 @@ class ProcessPuckHSV:
         elif int(x) > constants.FIELD_HEIGHT - constants.PUCK_RADIUS:
             x = constants.FIELD_HEIGHT - constants.PUCK_RADIUS
         if int(y) < constants.PUCK_RADIUS:
-            x = constants.PUCK_RADIUS
+            y = constants.PUCK_RADIUS
         elif int(y) > constants.FIELD_WIDTH - constants.PUCK_RADIUS:
-            x = constants.FIELD_WIDTH - constants.PUCK_RADIUS
+            y = constants.FIELD_WIDTH - constants.PUCK_RADIUS
 
         center = (int(x), int(y))
 

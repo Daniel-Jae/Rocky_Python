@@ -176,7 +176,7 @@ class CameraCalibration:
 if __name__ == "__main__":
     pass
 
-    video = CameraCalibration()
+    video = CameraCalibration(camera=1)
     video.choose()
     video.getImages()
     # video.getImages()

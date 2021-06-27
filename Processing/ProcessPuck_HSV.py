@@ -93,8 +93,7 @@ class ProcessPuckHSV:
             cv2.imshow("mask", mask)
             cv2.imshow("result", res)
             key = cv2.waitKey(1)
-            # ESC
-            if key == 27:
+            if key == ord("q") or key == 13:
                 break
 
         cv2.destroyAllWindows()
@@ -147,7 +146,8 @@ class ProcessPuckHSV:
 
         # img = cv2.imread("Processing/hsv_TestImages/hsv_test_1.jpeg", 1)
         while True:
-            if cv2.waitKey(1) == ord("q"):
+            key = cv2.waitKey(1)
+            if key == 13 or key == ord("q"):
                 break
 
             img, amountOfFrames = self.field.getImage()

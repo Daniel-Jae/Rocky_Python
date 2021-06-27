@@ -1,4 +1,5 @@
 import serial
+import cv2
 import time
 import random
 from Constants import constants
@@ -26,6 +27,8 @@ class MoveMotor:
             img, amountOfFrames = self.read_position_and_image()
 
         while True:
+            if cv2.waitKey(1) == ord("q"):
+                break
             img, amountOfFrames = self.read_position_and_image()
             if amountOfFrames == 0:
                 continue

@@ -59,9 +59,7 @@ class PathPrediction:
                 predicted_y = constants.FIELD_HEIGHT_PATH
             else:
                 predicted_y = 0
-            remaining_distance = predicted_y - (
-                self.center_new[1]
-            )
+            remaining_distance = predicted_y - (self.center_new[1])
             multiplicator = abs(remaining_distance / direction[1])
             predicted_position = self.center_new + (multiplicator * direction)
             predicted_x = predicted_position[0]
@@ -75,12 +73,22 @@ class PathPrediction:
         video_shower = VideoOutput(img).start()
 
         while True:
-            if cv2.waitKey(1) == ord("q"):
+            key = cv2.waitKey(1)
+            if key == 13 or key == ord("q"):
                 break
 
             img, cropped_img, amountOfFrames = self.read_position_and_image()
             if amountOfFrames == 0:
-                cv2.rectangle(img, (constants.PUCK_RADIUS, constants.PUCK_RADIUS), (constants.FIELD_HEIGHT - constants.PUCK_RADIUS, constants.FIELD_WIDTH - constants.PUCK_RADIUS), (255, 0, 0), 3)
+                cv2.rectangle(
+                    img,
+                    (constants.PUCK_RADIUS, constants.PUCK_RADIUS),
+                    (
+                        constants.FIELD_HEIGHT - constants.PUCK_RADIUS,
+                        constants.FIELD_WIDTH - constants.PUCK_RADIUS,
+                    ),
+                    (255, 0, 0),
+                    3,
+                )
                 video_shower.frame = img
                 continue
 
@@ -88,7 +96,16 @@ class PathPrediction:
             start_point = self.center_new
 
             if predicted_x is None:
-                cv2.rectangle(img, (constants.PUCK_RADIUS, constants.PUCK_RADIUS), (constants.FIELD_HEIGHT - constants.PUCK_RADIUS, constants.FIELD_WIDTH - constants.PUCK_RADIUS), (255, 0, 0), 3)
+                cv2.rectangle(
+                    img,
+                    (constants.PUCK_RADIUS, constants.PUCK_RADIUS),
+                    (
+                        constants.FIELD_HEIGHT - constants.PUCK_RADIUS,
+                        constants.FIELD_WIDTH - constants.PUCK_RADIUS,
+                    ),
+                    (255, 0, 0),
+                    3,
+                )
                 video_shower.frame = img
                 continue
             else:
@@ -163,8 +180,22 @@ class PathPrediction:
                 end_tuple = (int(end_point[1]), int(end_point[0]))
                 cv2.line(cropped_img, start_tuple, end_tuple, (0, 0, 255), 5)
 
-            img[constants.PUCK_RADIUS:(constants.FIELD_WIDTH - constants.PUCK_RADIUS), constants.PUCK_RADIUS:(constants.FIELD_HEIGHT - constants.PUCK_RADIUS)] = cropped_img
-            cv2.rectangle(img, (constants.PUCK_RADIUS, constants.PUCK_RADIUS), (constants.FIELD_HEIGHT - constants.PUCK_RADIUS, constants.FIELD_WIDTH - constants.PUCK_RADIUS), (255, 0, 0), 3)
+            img[
+                constants.PUCK_RADIUS : (constants.FIELD_WIDTH - constants.PUCK_RADIUS),
+                constants.PUCK_RADIUS : (
+                    constants.FIELD_HEIGHT - constants.PUCK_RADIUS
+                ),
+            ] = cropped_img
+            cv2.rectangle(
+                img,
+                (constants.PUCK_RADIUS, constants.PUCK_RADIUS),
+                (
+                    constants.FIELD_HEIGHT - constants.PUCK_RADIUS,
+                    constants.FIELD_WIDTH - constants.PUCK_RADIUS,
+                ),
+                (255, 0, 0),
+                3,
+            )
             video_shower.frame = img
 
     def read_position(self):
@@ -176,9 +207,16 @@ class PathPrediction:
         if amount_of_frames > 0:
             crop_height = constants.FIELD_HEIGHT - constants.PUCK_RADIUS
             crop_width = constants.FIELD_WIDTH - constants.PUCK_RADIUS
-            cropped_img = img[constants.PUCK_RADIUS:(constants.FIELD_WIDTH - constants.PUCK_RADIUS), constants.PUCK_RADIUS:(constants.FIELD_HEIGHT - constants.PUCK_RADIUS)]
+            cropped_img = img[
+                constants.PUCK_RADIUS : (constants.FIELD_WIDTH - constants.PUCK_RADIUS),
+                constants.PUCK_RADIUS : (
+                    constants.FIELD_HEIGHT - constants.PUCK_RADIUS
+                ),
+            ]
             self.center_old = self.center_new
-            self.center_new = np.array([position[1], position[0]]) - constants.PUCK_RADIUS
+            self.center_new = (
+                np.array([position[1], position[0]]) - constants.PUCK_RADIUS
+            )
         else:
             cropped_img = img
         return img, cropped_img, amount_of_frames

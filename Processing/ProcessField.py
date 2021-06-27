@@ -299,7 +299,7 @@ class ProcessField:
 
         img, amountOfFrames = self.videostream.readWithFrames()
         if amountOfFrames == 0:
-            return (0, 0)
+            return (img, 0)
         M = cv2.getPerspectiveTransform(self.pts1, self.pts2)
         dst = cv2.warpPerspective(img, M, (self.height, self.length))
 

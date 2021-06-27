@@ -218,7 +218,7 @@ class PathPrediction:
                 np.array([position[1], position[0]]) - constants.PUCK_RADIUS
             )
         else:
-            cropped_img = img
+            cropped_img = img.copy()
         return img, cropped_img, amount_of_frames
 
 

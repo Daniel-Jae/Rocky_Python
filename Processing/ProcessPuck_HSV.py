@@ -114,7 +114,7 @@ class ProcessPuckHSV:
         contours, hierarchy = cv2.findContours(mask_blur, 1, 2)
 
         if not contours:
-            return None
+            return ((0, 0), 0)
 
         cnt = contours[0]
 
@@ -141,7 +141,7 @@ class ProcessPuckHSV:
                 abs(center[0] - self.old_center[0]) < self.threshold
                 and abs(center[1] - self.old_center[1]) < self.threshold
             ):
-                return None
+                return ((0, 0), 0)
 
         self.old_center = center
 
@@ -173,12 +173,10 @@ class ProcessPuckHSV:
             if amountOfFrames == 0:
                 continue
             # print(amountOfFrames)
-
-            if self._get_puck_position(img) is None:
+            center, radius = self._get_puck_position(img)
+            if radius == 0:
                 video_shower.frame = img
                 continue
-
-            center, radius = self._get_puck_position(img)
 
             print(center)
 
@@ -201,10 +199,9 @@ class ProcessPuckHSV:
             return (img, (0, 0), 0)
 
         self.frames_since_last_detection += amount_of_frames
-        if self._get_puck_position(img) is None:
-            return (img, (0, 0), 0)
-
         center, radius = self._get_puck_position(img)
+        if radius == 0:
+            return (img, (0, 0), 0)
 
         frames_since_last_detection = self.frames_since_last_detection
         self.frames_since_last_detection = 0
@@ -217,10 +214,10 @@ class ProcessPuckHSV:
 
         self.frames_since_last_detection += amount_of_frames
 
-        if self._get_puck_position(img) is None:
+        center, radius = self._get_puck_position(img)
+        if radius == 0:
             return ((0, 0), 0)
 
-        center, radius = self._get_puck_position(img)
         frames_since_last_detection = self.frames_since_last_detection
         self.frames_since_last_detection = 0
         return (center, frames_since_last_detection)

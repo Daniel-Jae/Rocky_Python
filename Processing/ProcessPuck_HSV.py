@@ -7,9 +7,13 @@ from Constants import constants
 
 
 class ProcessPuckHSV:
-    def __init__(self, processField=0):
+    def __init__(self, processField=0, threshold=0):
         self.field = processField
 
+        # The amount of pixel the puck center has to move at least in one direction to detect movement
+        # aka return another position of the puck
+        self.threshold = threshold
+        self.old_center = None
         self.frames_since_last_detection = 0
         self.lower_boundary = np.array([61, 94, 40])
         self.upper_boundary = np.array([90, 255, 144])
@@ -119,7 +123,27 @@ class ProcessPuckHSV:
         # We also tried cv2.HoughCircles as seen in "testHSV.py", but somehow it doesn't work.
         # It might be faster than this method though. So if you are able to get the center with cv2.HoughCircles... give it a try
         (x, y), radius = cv2.minEnclosingCircle(cnt)
+
+        # Check if center is closer to a wall than puck-radius allows. Correct it by setting the value to puck-radius
+        if int(x) < constants.PUCK_RADIUS:
+            x = constants.PUCK_RADIUS
+        elif int(x) > constants.FIELD_HEIGHT - constants.PUCK_RADIUS:
+            x = constants.FIELD_HEIGHT - constants.PUCK_RADIUS
+        if int(y) < constants.PUCK_RADIUS:
+            x = constants.PUCK_RADIUS
+        elif int(y) > constants.FIELD_WIDTH - constants.PUCK_RADIUS:
+            x = constants.FIELD_WIDTH - constants.PUCK_RADIUS
+
         center = (int(x), int(y))
+
+        if self.old_center is not None:
+            if (
+                abs(center[0] - self.old_center[0]) < self.threshold
+                and abs(center[1] - self.old_center[1]) < self.threshold
+            ):
+                return None
+
+        self.old_center = center
 
         # Alternative without minEnclosingCircle():
         # M = cv2.moments(cnt)
@@ -179,7 +203,7 @@ class ProcessPuckHSV:
         self.frames_since_last_detection += amount_of_frames
         if self._get_puck_position(img) is None:
             return (img, (0, 0), 0)
-        
+
         center, radius = self._get_puck_position(img)
 
         frames_since_last_detection = self.frames_since_last_detection
@@ -192,7 +216,7 @@ class ProcessPuckHSV:
             return ((0, 0), 0)
 
         self.frames_since_last_detection += amount_of_frames
-        
+
         if self._get_puck_position(img) is None:
             return ((0, 0), 0)
 

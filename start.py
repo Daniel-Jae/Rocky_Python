@@ -15,7 +15,7 @@ import numpy as np
 # print(ROOT_DIR)
 
 
-newVideoStream = VideoStream(1)
+newVideoStream = VideoStream(0)
 
 newVideoStream.start()
 

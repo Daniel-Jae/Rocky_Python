@@ -66,7 +66,7 @@ class ProcessPuckHSV:
         # "while True", so that the images are getting "refreshed" everytime the hsv values change
         while True:
             img = self.getImage()
-            if not img:
+            if img is None:
                 continue
 
             img = cv2.resize(img, (0, 0), fx=0.1, fy=0.1)
@@ -217,18 +217,24 @@ class ProcessPuckHSV:
         contours, hierarchy = cv2.findContours(mask_blur, 1, 2)
 
         if not contours:
-            return ((0, 0), 0)
+            return (img, (0, 0), 0)
 
         cnt = contours[0]
 
-        M = cv2.moments(cnt)
-        # Check for null-divison
-        if M["m00"] == 0:
-            return ((0, 0), 0)
-        cx = int(M["m10"] / M["m00"])
-        cy = int(M["m01"] / M["m00"])
+        #(x, y), radius = cv2.minEnclosingCircle(cnt)
+        #center = (int(x), int(y))
 
-        center = (cx, cy)
+
+        (x, y), radius = cv2.minEnclosingCircle(cnt)
+        center = (int(x), int(y))
+        #M = cv2.moments(cnt)
+        # Check for null-divison
+        #if M["m00"] == 0:
+        #    return (img, (0, 0), 0)
+        #cx = int(M["m10"] / M["m00"])
+        #cy = int(M["m01"] / M["m00"])
+
+        #center = (cx, cy)
         # print(center)
         return (img, center, amountOfFrames)
 

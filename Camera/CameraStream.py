@@ -14,7 +14,8 @@ class VideoStream:
         self.framesSinceLastRequest = 0
         self.framerate = framerate
 
-        self.currentTime, self.previousTime = 0
+        self.currentTime = time.time()
+        self.previousTime = time.time()
 
     def calculateFPS():
         # Calculate the "real" Frames of the Camera

@@ -200,6 +200,7 @@ class PathPrediction:
             video_shower.frame = img
 
     def read_position(self):
+        position, amount_of_frames = self.process_puck.read_position()
         pass
 
     # t

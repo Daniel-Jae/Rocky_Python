@@ -22,14 +22,14 @@ class MoveMotor:
         self.arduino.write(bytes("calibrate", "utf-8"))
         time.sleep(5)
 
-        img, amountOfFrames = self.read_position_and_image()
+        amountOfFrames = self.read_position()
         while amountOfFrames == 0:
-            img, amountOfFrames = self.read_position_and_image()
+            amountOfFrames = self.read_position()
 
         while True:
             if cv2.waitKey(1) == ord("q"):
                 break
-            img, amountOfFrames = self.read_position_and_image()
+            amountOfFrames = self.read_position()
             if amountOfFrames == 0:
                 continue
             time.sleep(0.5)
@@ -73,6 +73,14 @@ class MoveMotor:
     #   num = input("Enter a string: ") # Taking input from user
     #  value = write(num)
     # print(value) # printing the value
+
+    def read_position(self):
+        position, amount_of_frames = self.process_puck.read_position()
+        if amount_of_frames == 0:
+            return amount_of_frames
+        else:
+            self.center = position
+            return amount_of_frames
 
     def read_position_and_image(self):
         img, position, amount_of_frames = self.process_puck.read_position_and_image()

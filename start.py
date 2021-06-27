@@ -11,7 +11,7 @@ from Prediction.pathPrediction import PathPrediction
 import cv2
 import numpy as np
 
-#new_cameraCalibration = CameraCalibration(camera=0)
+# new_cameraCalibration = CameraCalibration(camera=0)
 
 newVideoStream = VideoStream(camera=0)
 
@@ -29,7 +29,7 @@ if hsv == True:
 
     newProcessPuckHSV.setHSV()
 
-    # newProcessPuckHSV.getPuckPositionAlways()
+    # newProcessPuckHSV.show_puck()
 
 else:
 

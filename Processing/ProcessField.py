@@ -2,6 +2,7 @@
 # the resulting image has always the same dimensions and the robot- and human-line are on the same side
 # The game-field in the image has to be put manually by calling chooseCorner()
 # -> Left-MouseClick = Robot-Corner AND Right-MouseClick = Human-Corner
+# After the corners have been selected you can choose wheter or not you want to keep the corners or try again (so far in the terminal)
 # After the corners have been selected you can choose wheter or not you want to flip the image (so far in the terminal)
 
 import cv2
@@ -20,7 +21,8 @@ class ProcessField:
         self.videostream = videoStream
         frame, amountOfFrames = self.videostream.readWithFrames()
         # frame = cv2.resize(frame, (0, 0), fx=0.7, fy=0.7)
-        self.image = frame
+        self.image = frame.copy()
+        self.draw_img = frame.copy()
         self.ptHuman = []
         self.ptRobot = []
 
@@ -64,13 +66,13 @@ class ProcessField:
 
             font = cv2.FONT_HERSHEY_SIMPLEX
             cv2.putText(
-                self.image, "Roboter", (x + 10, y + 10), font, 0.9, (0, 0, 255), 2
+                self.draw_img, "Roboter", (x + 10, y + 10), font, 0.9, (0, 0, 255), 2
             )
             # circle outside point
-            cv2.circle(self.image, (x, y), 10, (0, 0, 255), 2)
+            cv2.circle(self.draw_img, (x, y), 10, (0, 0, 255), 2)
             # point
-            cv2.circle(self.image, (x, y), 2, (0, 0, 255), -1)
-            cv2.imshow("image", self.image)
+            cv2.circle(self.draw_img, (x, y), 2, (0, 0, 255), -1)
+            cv2.imshow("image", self.draw_img)
 
         # checking for right mouse clicks
         elif event == cv2.EVENT_RBUTTONDOWN and len(self.ptHuman) < 2:
@@ -80,20 +82,29 @@ class ProcessField:
 
             font = cv2.FONT_HERSHEY_SIMPLEX
             cv2.putText(
-                self.image, "Mensch", (x + 10, y + 10), font, 0.9, (255, 0, 0), 2
+                self.draw_img, "Mensch", (x + 10, y + 10), font, 0.9, (255, 0, 0), 2
             )
             # circle outside point
-            cv2.circle(self.image, (x, y), 10, (255, 0, 0), 2)
+            cv2.circle(self.draw_img, (x, y), 10, (255, 0, 0), 2)
             # point
-            cv2.circle(self.image, (x, y), 2, (255, 0, 0), -1)
-            cv2.imshow("image", self.image)
+            cv2.circle(self.draw_img, (x, y), 2, (255, 0, 0), -1)
+            cv2.imshow("image", self.draw_img)
 
     def chooseCorner(self):
         # print(self.image)
-
-        cv2.imshow("image", self.image)
-        cv2.setMouseCallback("image", self.click_event)
-        cv2.waitKey(0)
+        # Show image as long as there aren't 4 corners for the field
+        # Quit by pressing "q"
+        while True:
+            while True:
+                key = cv2.waitKey(1)
+                # Enter or "q"
+                if key == 13 or key == ord("q"):
+                    break
+                cv2.imshow("image", self.draw_img)
+                cv2.setMouseCallback("image", self.click_event)
+            if len(self.ptRobot) == 2 and len(self.ptHuman) == 2:
+                break
+        # cv2.waitKey(0)
         cv2.destroyAllWindows()
 
         # height = self.image.shape[0]
@@ -142,7 +153,7 @@ class ProcessField:
                         newList.append(self.ptRobot[0])
             # robot on the left side
             else:
-                
+
                 # Check which point is on top: If true: first point on top
                 if self.ptRobot[0][1] < self.ptRobot[1][1]:
                     newList.append(self.ptRobot[0])
@@ -209,7 +220,7 @@ class ProcessField:
         # if ((self.ptRobot[0][0] + self.ptRobot[1][0]) > (self.ptHuman[0][0] + self.ptHuman[1][0])):
 
         self.pts1 = np.asarray(newList, np.float32)
-        print(self.pts1)
+        # print(self.pts1)
 
         """ test = np.asarray(self.ptRobot, np.float32)
         print(test)
@@ -239,6 +250,20 @@ class ProcessField:
         plt.subplot(122), plt.imshow(dst), plt.title("Output")
         plt.show()
 
+        answer_corners_ok = None
+        while answer_corners_ok not in ("1", "2"):
+            answer_corners_ok = input("1 -> Feld passt. 2 -> Ecken erneut setzen: ")
+            if answer_corners_ok == "1":
+                continue
+            elif answer_corners_ok == "2":
+                self.ptHuman = []
+                self.ptRobot = []
+                self.draw_img = img.copy()
+                self.chooseCorner()
+                return
+            else:
+                print("Bitte gebe 1 oder 2 ein")
+
         # Answer wether or not you want to flip the camera-input vertically.
         # If you flip: left and right for the robot gets switched
         answerFlip = None
@@ -258,6 +283,7 @@ class ProcessField:
 
     def getImage(self):
         # Because the flow of the programm doesn't use getImage() before chooseCorner() got called, this query is useless for now.
+        # If you want to add a function where the whole images from the camera are getting used, here it is
         """if self.chooseCorner == False:
             answerCorner = None
             while answerCorner not in ("J", "j", "n", "N"):

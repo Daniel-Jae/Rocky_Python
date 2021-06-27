@@ -43,6 +43,7 @@ class CameraCalibration:
                 if not showFiles:
                     print("Keine Datei vorhanden")
                     self.choose()
+                    return
                 showFiles = showFiles + "  Input-> "
                 while answerFile not in range(1, idx + 1):
                     answerFile = input(showFiles)
@@ -77,7 +78,7 @@ class CameraCalibration:
 
     def showUndistortImage(self):
         dst = cv2.undistort(
-            self.images[0], self.cameraMatrix, self.distortion, None, self.newcameramtx
+            self.images[9], self.cameraMatrix, self.distortion, None, self.newcameramtx
         )
         # You can crop the image here according to the calibration.
         # We will crop the image later anyway for the field, so  we don't use it (so far)

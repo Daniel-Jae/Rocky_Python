@@ -7,12 +7,15 @@ import time
 
 
 class VideoStream:
-    def __init__(self, camera=0, framerate=60):
+    def __init__(self, camera=0, framerate=60, calibration=None):
         self.stream = cv2.VideoCapture(camera)
         (self.grabbed, self.frame) = self.stream.read()
         self.stopped = False
         self.framesSinceLastRequest = 0
         self.framerate = framerate
+        self.camera_calibration = calibration
+        if self.camera_calibration != None:
+            self.camera_calibration.choose()
 
         self.currentTime = time.time()
         self.previousTime = time.time()
@@ -39,16 +42,47 @@ class VideoStream:
 
     def start(self):
         self.previousTime = time.time()
-        Thread(target=self.get, args=()).start()
-        return self
+        if self.camera_calibration == None:
+            Thread(target=self.get_without_calibration, args=()).start()
+            return self
+        elif self.camera_calibration.getCalibration() == None:
+            Thread(target=self.get_without_calibration, args=()).start()
+            return self
+        else:
+            (
+                self.cameraMatrix,
+                self.distortion,
+            ) = self.camera_calibration.getCalibration()
+            Thread(target=self.get_with_calibration, args=()).start()
+            return self
 
-    def get(self):
+    def get_without_calibration(self):
         while not self.stopped:
             if not self.grabbed:
                 self.stop()
             else:
                 self.framesSinceLastRequest += 1
                 (self.grabbed, self.frame) = self.stream.read()
+        print("Camera stopped.")
+
+    def get_with_calibration(self):
+        while not self.stopped:
+            if not self.grabbed:
+                self.stop()
+            else:
+                self.framesSinceLastRequest += 1
+                (self.grabbed, self.frame) = self.stream.read()
+                h, w = self.frame.shape[:2]
+                self.newcameramtx, self.roi = cv2.getOptimalNewCameraMatrix(
+                    self.cameraMatrix, self.distortion, (w, h), 1, (w, h)
+                )
+                self.frame = cv2.undistort(
+                    self.frame,
+                    self.cameraMatrix,
+                    self.distortion,
+                    None,
+                    self.newcameramtx,
+                )
         print("Camera stopped.")
 
     # return the newest frame -if available- and return the amount of time -in seconds- that passed since the last request

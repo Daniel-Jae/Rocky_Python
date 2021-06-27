@@ -11,11 +11,26 @@ class MoveMotor:
         self.arduino = serial.Serial(port="COM3", baudrate=9600, timeout=0.1)
         self.center = (0, 0)
 
-    # Get the correct coordinates
-    def getCoordinates(self):
-        position = self.process_puck.getImage()
+    # calibrate the robot
+    def calibrate(self):
+        time.sleep(5)
+        self.arduino.write(bytes("calibrate", "utf-8"))
+        time.sleep(5)
 
-        return position
+    # move to certain location(x, y)
+    def move_x_y_absolute(self, width, height):
+        motor_width, motor_height = self._real_to_motor(width, height)
+        string = str(motor_height) + "," + str(motor_width)
+        self.arduino.write(bytes(string, "utf-8"))
+        time.sleep(2)
+
+    # Calculate the values you have to send the motor, when you get real pixel values
+    def _real_to_motor(self, width, height):
+        multiplier_width = constants.MOTOR_WIDTH / constants.FIELD_WIDTH
+        motor_coordinate_width = int(width * multiplier_width)
+        multiplier_height = constants.MOTOR_HEIGHT / constants.FIELD_HEIGHT
+        motor_coordinate_height = int(height * multiplier_height)
+        return (motor_coordinate_width, motor_coordinate_height)
 
     def testMove(self):
         time.sleep(5)

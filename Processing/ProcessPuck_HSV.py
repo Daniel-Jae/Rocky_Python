@@ -150,15 +150,15 @@ class ProcessPuckHSV:
                 continue
             # print(amountOfFrames)
 
-            center, radius = self._get_puck_position(img)
-
-            if center is None:
+            if self._get_puck_position(img) is None:
                 video_shower.frame = img
                 continue
 
+            center, radius = self._get_puck_position(img)
+
             print(center)
 
-            cv2.circle(img, center, int(radius), (255, 0, 0), 2)
+            cv2.circle(img, center, int(radius), (255, 0, 0), 3)
             video_shower.frame = img
 
         video_shower.stop()
@@ -177,9 +177,10 @@ class ProcessPuckHSV:
             return (img, (0, 0), 0)
 
         self.frames_since_last_detection += amount_of_frames
-        center, radius = self._get_puck_position(img)
-        if center is None:
+        if self._get_puck_position(img) is None:
             return (img, (0, 0), 0)
+        
+        center, radius = self._get_puck_position(img)
 
         frames_since_last_detection = self.frames_since_last_detection
         self.frames_since_last_detection = 0
@@ -191,10 +192,11 @@ class ProcessPuckHSV:
             return ((0, 0), 0)
 
         self.frames_since_last_detection += amount_of_frames
-        center, radius = self._get_puck_position(img)
-        if center is None:
+        
+        if self._get_puck_position(img) is None:
             return ((0, 0), 0)
 
+        center, radius = self._get_puck_position(img)
         frames_since_last_detection = self.frames_since_last_detection
         self.frames_since_last_detection = 0
         return (center, frames_since_last_detection)

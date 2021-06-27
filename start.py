@@ -29,7 +29,7 @@ if hsv == True:
 
     newProcessPuckHSV.setHSV()
 
-    # newProcessPuckHSV.show_puck()
+    newProcessPuckHSV.show_puck()
 
 else:
 
@@ -37,9 +37,9 @@ else:
 
     newProcessPuckFiducial.getPuckPositionAlways()
 
-new_path_prediction = PathPrediction(newProcessPuckHSV)
+#new_path_prediction = PathPrediction(newProcessPuckHSV)
 
-new_path_prediction.draw_predicted_path()
+#new_path_prediction.draw_predicted_path()
 
 newVideoStream.stop()
 

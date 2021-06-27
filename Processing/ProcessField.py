@@ -18,7 +18,7 @@ from Constants import constants
 class ProcessField:
     def __init__(self, videoStream=0):
         self.videostream = videoStream
-        frame, amountOfFrames = self.videostream.read()
+        frame, amountOfFrames = self.videostream.readWithFrames()
         # frame = cv2.resize(frame, (0, 0), fx=0.7, fy=0.7)
         self.image = frame
         self.ptHuman = []
@@ -116,6 +116,7 @@ class ProcessField:
             if (self.ptRobot[0][0] + self.ptRobot[1][0]) > (
                 self.ptHuman[0][0] + self.ptHuman[1][0]
             ):
+                self.rotate = 180
                 # Check which point is on top: If true: first point on top
                 if self.ptHuman[0][1] < self.ptHuman[1][1]:
                     newList.append(self.ptHuman[0])
@@ -141,7 +142,7 @@ class ProcessField:
                         newList.append(self.ptRobot[0])
             # robot on the left side
             else:
-                self.rotate = 180
+                
                 # Check which point is on top: If true: first point on top
                 if self.ptRobot[0][1] < self.ptRobot[1][1]:
                     newList.append(self.ptRobot[0])
@@ -171,7 +172,7 @@ class ProcessField:
             if (self.ptRobot[0][1] + self.ptRobot[1][1]) < (
                 self.ptHuman[0][1] + self.ptHuman[1][1]
             ):
-                self.rotate = 90
+                self.rotate = 270
                 if self.ptRobot[0][0] < self.ptRobot[1][0]:
                     newList.append(self.ptRobot[0])
                     newList.append(self.ptRobot[1])
@@ -187,7 +188,7 @@ class ProcessField:
                     newList.append(self.ptHuman[0])
             # robot on bottom
             else:
-                self.rotate = 270
+                self.rotate = 90
                 if self.ptHuman[0][0] < self.ptHuman[1][0]:
                     newList.append(self.ptHuman[0])
                     newList.append(self.ptHuman[1])

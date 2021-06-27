@@ -75,6 +75,7 @@ class PathPrediction:
         while True:
             key = cv2.waitKey(1)
             if key == 13 or key == ord("q"):
+                video_shower.stop()
                 break
 
             img, cropped_img, amountOfFrames = self.read_position_and_image()

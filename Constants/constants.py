@@ -19,7 +19,7 @@ CHAMBER_SIZE = 30  # on both size - eg: 30 = 30mm x 30mm
 MOTOR_WIDTH = 15000
 MOTOR_HEIGHT = 22000
 # Objects sizes in game units
-PUCK_RADIUS = 35
+PUCK_RADIUS = 31
 STRIKER_RADIUS = 50
 
 # Field dimensions for path prediction

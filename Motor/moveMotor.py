@@ -7,7 +7,7 @@ from Constants import constants
 class MoveMotor:
     def __init__(self, processPuckHSV=0):
         self.process_puck = processPuckHSV
-        self.arduino = serial.Serial(port='COM3', baudrate=9600, timeout=.1)
+        self.arduino = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=.1)
         self.center = (0,0)
 
     # Get the correct coordinates
@@ -25,6 +25,9 @@ class MoveMotor:
         while amountOfFrames == 0:
             img, amountOfFrames = self.read_position_and_image()
 
+        old_motor_coordinate_width = 0
+        old_motor_coordinate_height = 0
+
         while True:
             img, amountOfFrames = self.read_position_and_image()
             if amountOfFrames == 0:
@@ -39,16 +42,33 @@ class MoveMotor:
             motor_coordinate_height = int(motor_coordinate_height)
             if self.center[0] > constants.FIELD_HEIGHT * 0.4:
                 motor_coordinate_height = 2000
+            motor_coordinate_width = round(motor_coordinate_width, -2)
+            motor_coordinate_height = round(motor_coordinate_height, -2)
+            #print("Sending: position")
+            #self.arduino.write(bytes("position", 'utf-8'))
+            #data = self.arduino.readline()
+            #print(data)
+            #data = str(data)
+            #print("Data as String: " + data)
+            #whitelist = set('0123456789,')
+            #data = ''.join(filter(whitelist.__contains__, data))
+            #print("Data number only: " + data)
+            #time.sleep(1)
+            ready = False
+            self.arduino.write(bytes("position", 'utf-8'))
+            ready_string = self.arduino.readline()
+            print(ready_string)
 
-            print(motor_coordinate_width)
-            print(motor_coordinate_height)
-            rnd_value = 2000 + int(random.random() * 4000)
-            string = str(motor_coordinate_height) + ',' + str(motor_coordinate_width)
-            #string = "random"
-            self.arduino.write(bytes(string, 'utf-8'))
-            time.sleep(2)
-            #data = arduino.readline()
-        
+            if motor_coordinate_width != old_motor_coordinate_width:
+                if motor_coordinate_height != old_motor_coordinate_height:
+                        #if ready:
+                        string = str(motor_coordinate_height) + ',' + str(motor_coordinate_width)
+                        #string = "random"
+                        print("Sending: " + string)
+                        self.arduino.write(bytes(string, 'utf-8'))
+                        time.sleep(0.5)
+            old_motor_coordinate_width = motor_coordinate_width
+            old_motor_coordinate_height = motor_coordinate_height
 
     def loop(self):
         while True:

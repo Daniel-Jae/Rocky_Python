@@ -30,7 +30,7 @@ if hsv == True:
 
     newProcessPuckHSV.setHSV()
 
-    newProcessPuckHSV.show_puck()
+    #newProcessPuckHSV.show_puck()
 
 else:
 

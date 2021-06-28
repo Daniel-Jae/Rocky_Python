@@ -7,6 +7,7 @@ from Processing.ProcessField import ProcessField
 from Processing.ProcessPuck_Fiducial import ProcessPuck
 from Processing.ProcessPuck_HSV import ProcessPuckHSV
 from Prediction.pathPrediction import PathPrediction
+from Motor.moveMotor import MoveMotor
 
 import cv2
 import numpy as np
@@ -29,7 +30,7 @@ if hsv == True:
 
     newProcessPuckHSV.setHSV()
 
-    #newProcessPuckHSV.show_puck()
+    newProcessPuckHSV.show_puck()
 
 else:
 
@@ -37,9 +38,13 @@ else:
 
     newProcessPuckFiducial.getPuckPositionAlways()
 
-new_path_prediction = PathPrediction(newProcessPuckHSV)
+new_motor = MoveMotor(newProcessPuckHSV)
 
-new_path_prediction.draw_predicted_path()
+new_motor.testMove()
+
+#new_path_prediction = PathPrediction(newProcessPuckHSV)
+
+#new_path_prediction.draw_predicted_path()
 
 newVideoStream.stop()
 

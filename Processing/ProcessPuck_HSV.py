@@ -15,8 +15,8 @@ class ProcessPuckHSV:
         self.threshold = threshold
         self.old_center = None
         self.frames_since_last_detection = 0
-        self.lower_boundary = np.array([61, 94, 40])
-        self.upper_boundary = np.array([90, 255, 144])
+        self.lower_boundary = np.array([40, 49, 40])
+        self.upper_boundary = np.array([69, 255, 255])
 
     # callback-function for trackbar. We don't use it, but have to declare it
     def nothing(x, y):
